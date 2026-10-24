@@ -47,9 +47,9 @@ memory_usage (){
 echo "Memory Usage:"
 mem_total=$(cat /proc/meminfo | grep -E '^(MemTotal)' | awk '{print $2}')
 mem_available=$(cat /proc/meminfo | grep -E '^(MemAvailable)' | awk '{print $2}')
-if [ -z "$mem_total" ] || [ -z "$mem_available" ] || [ "$mem_total" -eq 0 ]
+if [[ -z "$mem_total" || -z "$mem_available" ]] || ! [[ "$mem_total" =~ ^[0-9]+$ ]] || ! [[ "$mem_available" =~ ^[0-9]+$ ]] || [[ "$mem_total" -eq 0 ]]
 then
-echo "ERROR: Unable to retrieve memory usage"
+echo "ERROR: Unable to retrieve valid memory information"
 return 1
 fi
 memory_usage=$(( (mem_total - mem_available) * 100 / mem_total  )) 
