@@ -1,5 +1,11 @@
 #!/bin/bash
 set -o pipefail
+log_error () {
+local message="$1"
+local timestamp
+timestamp=$(date)
+printf '%s - ERROR: - %s\n'"$timestamp" "$message" >> health_check.log
+}
 show_hostname () {
 echo "Hostname:" 
 hostname
@@ -30,6 +36,7 @@ usage=$(df -h / | awk 'NR==2 {print $5}')
 if [ -z "$usage" ]
 then 
 echo "ERROR: Unable to retrieve disk usage"
+log_error "Unable to retrieve disk usage"
 return 1
 fi
 echo "Current Disk Usage: $usage"
@@ -50,6 +57,7 @@ mem_available=$(cat /proc/meminfo | grep -E '^(MemAvailable)' | awk '{print $2}'
 if [[ -z "$mem_total" || -z "$mem_available" ]] || ! [[ "$mem_total" =~ ^[0-9]+$ ]] || ! [[ "$mem_available" =~ ^[0-9]+$ ]] || [[ "$mem_total" -eq 0 ]]
 then
 echo "ERROR: Unable to retrieve valid memory information"
+log_error "Unable to retrieve valid memory information"
 return 1
 fi
 memory_usage=$(( (mem_total - mem_available) * 100 / mem_total  )) 
